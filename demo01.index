@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID TENSOR: ALCHEMIST CONSOLE</title>
+    <style>
+        :root { --main: #00ffa3; --accent: #00d4ff; --warn: #ffcc00; --danger: #ff0055; --bg: #050505; --panel: #0a0a0a; }
+        body { background: var(--bg); color: #e0e0e0; font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
+        h1 { color: var(--main); border-bottom: 2px solid var(--main); padding-bottom: 10px; margin-bottom: 5px; letter-spacing: 2px; text-align: center;}
+        .subtitle { color: #666; font-size: 0.8rem; margin-bottom: 30px; text-transform: uppercase; text-align: center;}
+
+        .container { width: 100%; max-width: 950px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        
+        .panel { background: var(--panel); border: 1px solid #333; padding: 25px; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.8); border-radius: 8px;}
+        .panel::before { content: ''; position: absolute; top:0; left:20px; right:20px; height:1px; background: linear-gradient(90deg, transparent, var(--main), transparent); }
+        
+        /* SLIDERS SECTION */
+        .slider-group { margin-bottom: 20px; }
+        .slider-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold; color: #aaa; margin-bottom: 8px; }
+        .slider-val { color: var(--accent); font-weight: bold; }
+        input[type=range] { width: 100%; appearance: none; background: #222; height: 6px; border-radius: 3px; outline: none; margin-bottom: 5px;}
+        input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: var(--main); border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px var(--main);}
+        
+        .section-title { font-size: 0.9rem; color: #555; border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 15px; letter-spacing: 1px; }
+
+        /* ENVIRONMENT & ENTROPY */
+        .env-slider::-webkit-slider-thumb { background: var(--warn); box-shadow: 0 0 10px var(--warn);}
+        .entropy-slider::-webkit-slider-thumb { background: var(--danger); box-shadow: 0 0 15px var(--danger);}
+
+        /* BTN */
+        .btn-synth { background: #001a11; border: 1px solid var(--main); color: var(--main); width: 100%; padding: 15px; font-size: 1.2rem; font-weight: bold; letter-spacing: 3px; cursor: pointer; transition: 0.3s; margin-top: 10px; border-radius: 4px;}
+        .btn-synth:hover { background: var(--main); color: #000; box-shadow: 0 0 20px rgba(0,255,163,0.5); }
+
+        /* ENGINE DISPLAY */
+        .engine-box { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; background: #080808; padding: 20px; border: 1px dashed #444; border-radius: 8px; margin-bottom: 20px; }
+        .atom-node { text-align: center; padding: 10px; background: #111; border-radius: 4px; border: 1px solid #222;}
+        .atom-role { font-size: 0.65rem; color: #888; letter-spacing: 1px; margin-bottom: 5px; }
+        .atom-sym { font-size: 2.2rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.2);}
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 5px; color: #aaa; }
+        .stat-val { color: var(--accent); }
+
+        /* RESULT LOG */
+        .formula-display { text-align: center; font-size: 1.8rem; color: #fff; letter-spacing: 2px; text-shadow: 0 0 10px var(--main); margin-bottom: 15px; background: #001100; padding: 15px; border: 1px solid #003311; border-radius: 4px;}
+        .log-box { font-size: 0.85rem; color: #ccc; line-height: 1.6; background: #0e0e0e; padding: 20px; border-radius: 4px; border-left: 3px solid var(--main); min-height: 150px;}
+        .highlight { color: var(--main); font-weight: bold; }
+        .tag { display: inline-block; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; background: #222; color: #aaa; margin-right: 5px; border: 1px solid #444;}
+        .mut-tag { color: var(--danger); border-color: var(--danger); }
+    </style>
+</head>
+<body>
+
+    <h1>ID TENSOR: ALCHEMIST CONSOLE</h1>
+    <div class="subtitle">S2N2 Macroscopic Generative Engine v1.1 (Thermal Entropy Enabled)</div>
+    
+    <div class="container">
+        <div class="panel">
+            <div class="section-title">1. MACROSCOPIC FUNCTIONS (機能ブレンド)</div>
+            
+            <div class="slider-group">
+                <div class="slider-header"><span>Conductivity (導電性 / 平面化)</span><span class="slider-val" id="valCond">50%</span></div>
+                <input type="range" id="slCond" min="0" max="100" value="50" oninput="updateUI()">
+            </div>
+            <div class="slider-group">
+                <div class="slider-header"><span>Polarity (極性 / 空間歪曲)</span><span class="slider-val" id="valPol">50%</span></div>
+                <input type="range" id="slPol" min="0" max="100" value="50" oninput="updateUI()">
+            </div>
+            <div class="slider-group">
+                <div class="slider-header"><span>Hardness (硬度 / 共有結合網)</span><span class="slider-val" id="valHard">50%</span></div>
+                <input type="range" id="slHard" min="0" max="100" value="50" oninput="updateUI()">
+            </div>
+
+            <div class="section-title" style="margin-top: 30px;">2. ENVIRONMENT VARIABLES (環境変数)</div>
+            <div class="slider-group">
+                <div class="slider-header"><span>Pressure (圧力効果)</span><span class="slider-val" style="color:var(--warn);" id="valPres">1.0 atm</span></div>
+                <input type="range" id="slPres" class="env-slider" min="1" max="100" value="1" oninput="updateUI()">
+            </div>
+
+            <div class="section-title" style="margin-top: 30px;">3. ENTROPY MUTATION (カオス・熱揺らぎ)</div>
+            <div class="slider-group">
+                <div class="slider-header"><span>Mutation Rate (揺らぎ)</span><span class="slider-val" style="color:var(--danger);" id="valMut">5.0%</span></div>
+                <input type="range" id="slMut" class="entropy-slider" min="0" max="100" value="5" oninput="updateUI()">
+                <div style="font-size:0.7rem; color:#666; margin-top:5px;">※自然界の熱揺らぎ(5%)を標準搭載。高くすると理論の隙間を突いた未知の合金を生成します。</div>
+            </div>
+
+            <button class="btn-synth" onclick="synthesize()">SYNTHESIZE MATERIAL</button>
+        </div>
+
+        <div class="panel">
+            <div class="section-title">S2N2 TERNARY ARCHITECTURE (三元系構成)</div>
+            
+            <div class="engine-box" id="engineBox">
+                <div class="atom-node">
+                    <div class="atom-role">Z1: BASE MATRIX</div>
+                    <div class="atom-sym" id="sym1">?</div>
+                    <div class="stat-row"><span>EN:</span><span id="en1" class="stat-val">-</span></div>
+                    <div class="stat-row"><span>IE:</span><span id="ie1" class="stat-val">-</span></div>
+                </div>
+                <div class="atom-node">
+                    <div class="atom-role">Z2: ELECTRON DONOR</div>
+                    <div class="atom-sym" id="sym2">?</div>
+                    <div class="stat-row"><span>EN:</span><span id="en2" class="stat-val">-</span></div>
+                    <div class="stat-row"><span>IE:</span><span id="ie2" class="stat-val">-</span></div>
+                </div>
+                <div class="atom-node">
+                    <div class="atom-role">Z3: STRONG PULLER</div>
+                    <div class="atom-sym" id="sym3">?</div>
+                    <div class="stat-row"><span>EN:</span><span id="en3" class="stat-val">-</span></div>
+                    <div class="stat-row"><span>IE:</span><span id="ie3" class="stat-val">-</span></div>
+                </div>
+            </div>
+
+            <div class="formula-display" id="formulaDisp">AWAITING PARAMETERS...</div>
+            <div id="logText" class="log-box">数値を設定し、合成ボタンを押してジェネレーティブ・エンジンを起動してください。</div>
+        </div>
+    </div>
+
+    <script>
+        const ELEMENTS = [
+            { s: 'C',  en: 2.55, ie: 11.26, r: 0.77, type: 'net' },
+            { s: 'Si', en: 1.90, ie: 8.15,  r: 1.11, type: 'net' },
+            { s: 'Ti', en: 1.54, ie: 6.83,  r: 1.40, type: 'net' },
+            { s: 'B',  en: 2.04, ie: 8.30,  r: 0.82, type: 'net' },
+            { s: 'N',  en: 3.04, ie: 14.53, r: 0.71, type: 'pull' },
+            { s: 'O',  en: 3.44, ie: 13.62, r: 0.63, type: 'pull' },
+            { s: 'F',  en: 3.98, ie: 17.42, r: 0.58, type: 'pull' },
+            { s: 'Cl', en: 3.16, ie: 12.97, r: 0.99, type: 'pull' },
+            { s: 'S',  en: 2.58, ie: 10.36, r: 1.03, type: 'pull' },
+            { s: 'Na', en: 0.93, ie: 5.14,  r: 1.66, type: 'donor' },
+            { s: 'Ba', en: 0.89, ie: 5.21,  r: 2.15, type: 'donor' },
+            { s: 'Y',  en: 1.22, ie: 6.22,  r: 1.62, type: 'donor' },
+            { s: 'Cu', en: 1.90, ie: 7.73,  r: 1.32, type: 'base' },
+            { s: 'Pt', en: 2.28, ie: 8.96,  r: 1.36, type: 'base' },
+            { s: 'Bi', en: 2.02, ie: 7.29,  r: 1.43, type: 'base' },
+            { s: 'Fe', en: 1.83, ie: 7.90,  r: 1.24, type: 'base' },
+            { s: 'W',  en: 2.36, ie: 7.86,  r: 1.37, type: 'base' }
+        ];
+
+        function updateUI() {
+            document.getElementById('valCond').innerText = document.getElementById('slCond').value + '%';
+            document.getElementById('valPol').innerText = document.getElementById('slPol').value + '%';
+            document.getElementById('valHard').innerText = document.getElementById('slHard').value + '%';
+            
+            let pres = document.getElementById('slPres').value;
+            document.getElementById('valPres').innerText = (pres == 1) ? "1.0 atm" : (pres * 10) + " GPa";
+            
+            document.getElementById('valMut').innerText = document.getElementById('slMut').value + '.0%';
+        }
+
+        function synthesize() {
+            const cond = document.getElementById('slCond').value / 100;
+            const pol  = document.getElementById('slPol').value / 100;
+            const hard = document.getElementById('slHard').value / 100;
+            const pres = document.getElementById('slPres').value / 100; 
+            
+            // 【改修点】UIが100%でも、内部の崩壊臨界点(0.25)を超えないようにスケールを自動調整
+            const uiMut = document.getElementById('slMut').value / 100;
+            const internalMut = uiMut * 0.25; 
+
+            let target_gap_en = pol * 3.0; 
+            let target_base_ie = 10.0 - (cond * 5.0) + (hard * 3.0); 
+            let prefer_small_r = pres * 2.0 + hard * 1.0; 
+
+            let bestScore = -9999;
+            let result = {z1:null, z2:null, z3:null};
+            let wasMutated = false;
+
+            for(let i=0; i<ELEMENTS.length; i++) {
+                for(let j=0; j<ELEMENTS.length; j++) {
+                    for(let k=0; k<ELEMENTS.length; k++) {
+                        let z1 = ELEMENTS[i], z2 = ELEMENTS[j], z3 = ELEMENTS[k];
+                        if (z1.s===z2.s || z2.s===z3.s || z1.s===z3.s) continue; 
+
+                        let score = 0;
+                        let current_gap_en = z3.en - z2.en;
+                        score -= Math.abs(current_gap_en - target_gap_en) * 2.0;
+                        score -= Math.abs(z1.ie - target_base_ie);
+
+                        if(hard > 0.6 && z1.type === 'net') score += 3.0;
+                        if(cond > 0.6 && (z1.type === 'base' || z2.type === 'donor')) score += 2.0;
+                        score -= (z1.r + z2.r + z3.r) * prefer_small_r;
+
+                        // エントロピー加算。臨界点リミッター(internalMut)により物理計算は破綻しない
+                        let mutationNoise = (Math.random() - 0.2) * (internalMut * 15.0);
+                        score += mutationNoise;
+
+                        if (score > bestScore) {
+                            bestScore = score;
+                            result = {z1, z2, z3};
+                            // ノイズが物理スコアを上書きして順位を狂わせたか判定
+                            if (mutationNoise > 1.5) wasMutated = true; 
+                        }
+                    }
+                }
+            }
+
+            let r = result;
+            
+            document.getElementById('sym1').innerText = r.z1.s;
+            document.getElementById('en1').innerText = r.z1.en.toFixed(2);
+            document.getElementById('ie1').innerText = r.z1.ie.toFixed(1);
+            
+            document.getElementById('sym2').innerText = r.z2.s;
+            document.getElementById('en2').innerText = r.z2.en.toFixed(2);
+            document.getElementById('ie2').innerText = r.z2.ie.toFixed(1);
+            
+            document.getElementById('sym3').innerText = r.z3.s;
+            document.getElementById('en3').innerText = r.z3.en.toFixed(2);
+            document.getElementById('ie3').innerText = r.z3.ie.toFixed(1);
+
+            let ratio = Math.floor((pol + cond) / 2 * 5) + 1; 
+            document.getElementById('formulaDisp').innerText = `${r.z2.s} ${r.z1.s}${ratio} ${r.z3.s}`;
+
+            let log = "";
+            if (wasMutated && uiMut > 0.1) {
+                log += `<span class="tag mut-tag">MUTATION DETECTED</span> エントロピーによる強い熱揺らぎを検知。理論的最適解を逸脱し、未知の準安定状態(メタステーブル)へ着地しました。<br>`;
+            } else {
+                log += `<span class="tag">SYNTHESIS COMPLETE</span> 自然界の熱揺らぎ(基底エントロピー)を吸収し、安定した幾何学解を導出しました。<br>`;
+            }
+
+            log += `<br><span class="highlight">【構造解析レポート】</span><br>`;
+            
+            if (cond > 0.7) log += `・高度な導電性要求により、${r.z1.s}と${r.z2.s}の軌道が非局在化し、電子雲のネットワークが形成されています。<br>`;
+            if (pol > 0.7) log += `・${r.z2.s} (Donor) と ${r.z3.s} (Puller) の激しい引力(EN)のギャップが、空間を非対称に歪曲させ、巨大な双極子モーメントを生んでいます。<br>`;
+            if (hard > 0.7) log += `・${r.z1.s}を中心とした強固な共有結合ネットワークが形成。${pres > 0.5 ? 'さらに高圧環境が原子間距離を極限まで圧縮し、' : ''}ダイヤモンドに匹敵する幾何学的ロック(S値=0.25付近)が完了しています。<br>`;
+
+            if (cond < 0.3 && pol < 0.3 && hard < 0.3) {
+                log += `・パラメータが全体的に低く、特異な機能を持たない非晶質（アモルファス）状態に緩和されました。安定ですが利用価値は低いです。<br>`;
+            }
+
+            log += `<br>※ ${r.z2.s}(電子供与) ➔ [ ${r.z1.s}(多様体ベース) ] ➔ ${r.z3.s}(電子牽引) の「The Hunger Algorithm」がこの物質の空間歪みを決定づけています。`;
+
+            document.getElementById('logText').innerHTML = log;
+        }
+
+        // Init UI
+        updateUI();
+    </script>
+</body>
+</html>
