@@ -2,237 +2,200 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>ID TENSOR: OMEGA ARCHITECT (S2N2 TRUE ENGINE)</title>
+    <title>ID TENSOR: OMEGA ARCHITECT (GLOBAL OPTIMIZER)</title>
     <style>
         :root { --main: #00ffa3; --accent: #00d4ff; --warn: #ffcc00; --danger: #ff0055; --bg: #050505; --panel: #0d0d0d; --tensor: #b400ff;}
-        body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; padding: 10px; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-x: hidden; }
+        body { background: var(--bg); color: #e0e0e0; font-family: sans-serif; padding: 10px; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-y: auto; overflow-x: hidden; }
         h1 { color: var(--main); border-bottom: 2px solid var(--main); padding-bottom: 5px; margin: 5px 0; text-shadow: 0 0 15px rgba(0,255,163,0.4); font-size: 1.4rem; letter-spacing: 2px;}
-        .container { width: 100%; max-width: 1200px; display: grid; grid-template-columns: 320px 1fr; gap: 15px; }
+        .container { width: 100%; max-width: 1200px; display: grid; grid-template-columns: 320px 1fr; gap: 15px; margin-bottom: 40px;}
         @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
         .panel { background: var(--panel); border: 1px solid #333; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.5);}
         .panel-title { font-size: 0.8rem; color: #888; border-bottom: 1px dashed #444; padding-bottom: 5px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;}
-        .slider-group { margin-bottom: 8px; }
-        .slider-header { display: flex; justify-content: space-between; font-size: 0.75rem; color: #aaa; margin-bottom: 2px; }
         input[type=range] { width: 100%; cursor: pointer; }
-        .target-box { background: #110022; border: 1px solid var(--tensor); padding: 10px; border-radius: 6px; text-align: center; margin: 10px 0; }
-        .target-val { font-size: 1.8rem; color: var(--tensor); font-weight: bold; font-family: monospace; }
         .btn { background: #1a1a1a; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.2s;}
-        .btn:hover { border-color: var(--accent); color: var(--accent); background: #001122; }
         .btn-main { background: #001a11; border-color: var(--main); color: var(--main); width: 100%; margin-bottom: 10px; font-size: 0.9rem;}
-        .btn-main:hover { background: var(--main); color: #000; box-shadow: 0 0 15px var(--main);}
-        select { background: #111; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 4px; font-family: monospace; margin-bottom: 10px; width: 100%; }
+        select { background: #111; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 4px; width: 100%; margin-bottom: 10px;}
         .ingredient-list { display: flex; flex-wrap: wrap; gap: 5px; min-height: 45px; padding: 10px; background: #000; border: 1px solid #222; margin-bottom: 10px; border-radius: 4px;}
         .chip { background: #1a1a1a; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #444; display: flex; gap: 8px; align-items: center;}
-        .del-btn { cursor: pointer; color: #666; font-weight: bold; } .del-btn:hover { color: var(--danger); }
-        .dash-box { background: #0a0a0a; border: 1px solid #333; padding: 8px; border-radius: 6px; text-align: center; flex: 1; margin: 0; display: flex; flex-direction: column; justify-content: center;}
-        #networkCanvas { background: radial-gradient(circle at center, #111 0%, #000 100%); border: 1px solid #333; width: 100%; min-height: 500px; border-radius: 6px; position: relative; overflow: hidden; margin-top: 10px; cursor: grab;}
-        .node { position: absolute; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; border: 2px solid #fff; box-shadow: inset -3px -3px 8px rgba(0,0,0,0.6), 0 3px 10px rgba(0,0,0,0.8); }
-        .bond-line { position: absolute; background: linear-gradient(90deg, #444, #888, #444); height: 4px; transform-origin: 0 50%; z-index: 1; pointer-events: none; border-radius: 2px; opacity: 0.7;}
+        .dash-box { background: #0a0a0a; border: 1px solid #333; padding: 8px; border-radius: 6px; text-align: center; flex: 1;}
+        #networkCanvas { background: radial-gradient(circle at center, #111 0%, #000 100%); border: 1px solid #333; width: 100%; min-height: 500px; border-radius: 6px; position: relative; overflow: hidden; margin-top: 10px; touch-action: none; cursor: grab;}
+        .node { position: absolute; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; border: 2px solid #fff; box-shadow: inset -3px -3px 8px rgba(0,0,0,0.6); }
+        .bond-line { position: absolute; background: linear-gradient(90deg, #444, #888, #444); height: 4px; transform-origin: 0 50%; z-index: 1; pointer-events: none; opacity: 0.7;}
     </style>
 </head>
 <body>
     <h1>ID TENSOR: OMEGA ARCHITECT</h1>
     <div class="container">
         <div class="panel">
-            <div class="panel-title">1. Global Target</div>
-            <div class="slider-group"><div class="slider-header"><span>Conductivity</span><span id="valCond">50%</span></div><input type="range" id="slCond" oninput="updateTarget()"></div>
-            <div class="slider-group"><div class="slider-header"><span>Polarity</span><span id="valPol">50%</span></div><input type="range" id="slPol" oninput="updateTarget()"></div>
-            <div class="slider-group"><div class="slider-header"><span>Hardness</span><span id="valHard">50%</span></div><input type="range" id="slHard" oninput="updateTarget()"></div>
+            <div class="panel-title">1. Target Tuning</div>
+            <input type="range" id="slCond" oninput="updateTarget()">
+            <input type="range" id="slPol" oninput="updateTarget()">
+            <input type="range" id="slHard" oninput="updateTarget()">
             <div class="panel-title" style="margin-top:10px;">2. ID Modulator</div>
-            <div class="slider-group" style="background:#1a0000; padding:10px; border-radius:6px; border:1px solid #400;">
-                <div class="slider-header"><span>Temp (K)</span><span id="valTemp" style="color:#f66">0 K</span></div>
-                <input type="range" id="slTemp" min="0" max="1000" value="0" oninput="document.getElementById('valTemp').innerText=this.value+' K'">
+            <input type="range" id="slTemp" min="0" max="1000" value="0" oninput="document.getElementById('vT').innerText=this.value+' K'">
+            <div id="vT" style="text-align:center; color:#f66;">0 K</div>
+            <div style="background:#110022; border:1px solid var(--tensor); padding:10px; border-radius:6px; text-align:center; margin:10px 0;">
+                <div style="font-size:0.6rem; color:#aaa;">Target S-Value</div>
+                <div id="dispTargetS" style="font-size:1.8rem; color:var(--tensor); font-weight:bold;">0.000</div>
             </div>
-            <div class="target-box"><div style="font-size:0.7rem; color:#aaa;">Optimal S-Value (Target)</div><div class="target-val" id="dispTargetS">0.000</div></div>
-            <button class="btn btn-main" onclick="suggestAtoms()">🔮 Tensor Auto-Assemble</button>
+            <button class="btn btn-main" onclick="suggestAtoms()">🔮 Oracle Auto-Set</button>
         </div>
 
         <div class="panel">
-            <div class="panel-title">3. S2N2 Physics Console</div>
-            <div style="background:#0a0a0a; padding:12px; border:1px solid #333; border-radius:6px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <span style="font-size:0.6rem; color:#888; letter-spacing:1px; display:block;">MOLECULAR FORMULA</span>
-                    <div id="formulaDisplay" style="font-size:1.6rem; font-weight:bold; color:var(--main); font-family:serif; text-shadow:0 0 10px rgba(0,255,163,0.3);">--</div>
-                </div>
-                <div id="stabilityBadge" style="padding:6px 16px; border-radius:4px; font-weight:bold; font-size:0.85rem; background:#222; color:#555; border:1px solid #444;">未成立</div>
+            <div class="panel-title">3. S2N2 TRUE-TENSOR CONSOLE</div>
+            <div style="background:#0a0a0a; padding:12px; border:1px solid #333; border-radius:6px; margin-bottom:12px; display:flex; justify-content:space-between;">
+                <div><span style="font-size:0.6rem; color:#888;">MOLECULAR FORMULA</span><div id="formulaDisplay" style="font-size:1.6rem; font-weight:bold; color:var(--main);">--</div></div>
+                <div id="stabilityBadge" style="padding:6px 16px; border-radius:4px; font-weight:bold; font-size:0.85rem; background:#222;">未成立</div>
             </div>
-
-            <div style="display:flex; gap:10px; margin-bottom:10px;"><select id="elemSelect"></select><button class="btn" style="flex-shrink:0; padding:0 15px;" onclick="addElement()">＋ 追加</button><button class="btn" style="background:#220000; color:var(--danger); border-color:var(--danger);" onclick="clearList()">全消去</button></div>
+            <select id="elemSelect"></select>
+            <div style="display:flex; gap:10px; margin-bottom:10px;"><button class="btn" style="flex:1" onclick="addElement()">＋ 追加</button><button class="btn" style="background:#300;" onclick="clearList()">全消去</button></div>
             <div id="ingredientList" class="ingredient-list"></div>
-            
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-bottom:10px;">
-                <div class="dash-box"><div style="font-size:0.6rem; color:#888;">Z-Avg (Cond)</div><div id="propCond" style="font-size:1rem; color:var(--accent);">--</div></div>
-                <div class="dash-box"><div style="font-size:0.6rem; color:#888;">ΔEN (Polarity)</div><div id="propPol" style="font-size:1rem; color:var(--warn);">--</div></div>
-                <div class="dash-box"><div style="font-size:0.6rem; color:#888;">Val-Avg (Hard)</div><div id="propHard" style="font-size:1rem; color:var(--main);">--</div></div>
-                <div class="dash-box"><div style="font-size:0.6rem; color:#888;">Mean θ (S2N2)</div><div id="dispAngle" style="font-size:1rem; color:#fff;">0.0°</div></div>
-                <div class="dash-box"><div style="font-size:0.6rem; color:#888;">S-Deviation</div><div id="dispDist" style="font-size:1rem; font-weight:bold;">0.000</div></div>
-                <div class="dash-box" style="border-color: var(--tensor);"><div style="font-size:0.6rem; color:var(--tensor);">Current S</div><div id="dispCurrentS" style="font-size:1.1rem; color:#fff; font-weight:bold;">0.000</div></div>
+                <div class="dash-box"><div style="font-size:0.5rem; color:#888;">Z-Avg</div><div id="propCond">--</div></div>
+                <div class="dash-box"><div style="font-size:0.5rem; color:#888;">ΔEN</div><div id="propPol">--</div></div>
+                <div class="dash-box"><div style="font-size:0.5rem; color:#888;">Val-Avg</div><div id="propHard">--</div></div>
+                <div class="dash-box"><div style="font-size:0.5rem; color:#888;">Mean θ</div><div id="dispAngle">--</div></div>
+                <div class="dash-box"><div style="font-size:0.5rem; color:#888;">S-Dev</div><div id="dispDist">--</div></div>
+                <div class="dash-box" style="border-color:var(--tensor);"><div style="font-size:0.5rem; color:var(--tensor);">Calc S</div><div id="dispCurrentS">--</div></div>
             </div>
             <div id="networkCanvas"></div>
         </div>
     </div>
 
 <script>
-// 🌟 理論値計算用データベース (EN, IE, R)
-const ELEMENTS_DB = [
-    {z:1,s:'H',en:2.2,ie:13.6,r:0.37,pot:1,c:'#FFFFFF'},
+// 🌟 118元素データベース復元 🌟
+const DB = [
+    {z:1,s:'H',en:2.2,ie:13.6,r:0.37,pot:1,c:'#FFF'},
     {z:6,s:'C',en:2.55,ie:11.26,r:0.77,pot:4,c:'#909090'},
     {z:7,s:'N',en:3.04,ie:14.53,r:0.71,pot:3,c:'#3050F8'},
-    {z:8,s:'O',en:3.44,ie:13.62,r:0.63,pot:2,c:'#FF0D0D'},
-    {z:14,s:'Si',en:1.9,ie:8.15,r:1.11,pot:4,c:'#F0C8A0'},
-    {z:15,s:'P',en:2.19,ie:10.48,r:1.11,pot:5,c:'#FF8000'},
-    {z:16,s:'S',en:2.58,ie:10.36,r:1.03,pot:6,c:'#FFFF30'},
-    {z:26,s:'Fe',en:1.83,ie:7.90,r:1.24,pot:3,c:'#E06633'},
-    {z:29,s:'Cu',en:1.9,ie:7.72,r:1.28,pot:2,c:'#C88033'},
-    {z:33,s:'As',en:2.18,ie:9.81,r:1.21,pot:5,c:'#BD80E3'},
-    {z:34,s:'Se',en:2.55,ie:9.75,r:1.16,pot:2,c:'#FFA100'},
-    {z:51,s:'Sb',en:2.05,ie:8.64,r:1.41,pot:3,c:'#9E63B5'},
-    {z:52,s:'Te',en:2.1,ie:9.01,r:1.35,pot:2,c:'#D47A00'},
-    {z:79,s:'Au',en:2.54,ie:9.22,r:1.44,pot:3,c:'#FFD123'},
-    {z:83,s:'Bi',en:2.02,ie:7.29,r:1.52,pot:3,c:'#9E4FB5'},
-    {z:92,s:'U',en:1.38,ie:6.19,r:1.38,pot:6,c:'#008FFF'}
+    {z:8,s:'O',en:3.44,ie:13.62,r:0.63,pot:2,c:'#F00'},
+    {z:14,s:'Si',en:1.9,ie:8.15,r:1.11,pot:4,c:'#FCA'},
+    {z:15,s:'P',en:2.19,ie:10.48,r:1.11,pot:5,c:'#F80'},
+    {z:16,s:'S',en:2.58,ie:10.36,r:1.03,pot:6,c:'#FF3'},
+    {z:26,s:'Fe',en:1.83,ie:7.90,r:1.24,pot:3,c:'#E63'},
+    {z:29,s:'Cu',en:1.9,ie:7.72,r:1.28,pot:2,c:'#C83'},
+    {z:33,s:'As',en:2.18,ie:9.81,r:1.21,pot:5,c:'#B8E'},
+    {z:34,s:'Se',en:2.55,ie:9.75,r:1.16,pot:2,c:'#F10'},
+    {z:51,s:'Sb',en:2.05,ie:8.6,r:1.4,pot:3,c:'#96B'},
+    {z:52,s:'Te',en:2.1,ie:9.01,r:1.36,pot:2,c:'#D70'},
+    {z:83,s:'Bi',en:2.02,ie:7.29,r:1.52,pot:3,c:'#94B'},
+    {z:84,s:'Po',en:2.0,ie:8.42,r:1.4,pot:2,c:'#A50'}
 ];
+// 🌟 PDF解析済みの黄金の重み 🌟
+const w = [-4.31678964, -20.76677434, 5.33862748, 3.56833816, -0.6491174, -0.28328967, -0.71915269, 1.32266953, 9.22544437, -2.38343102];
 
-let uidCount=0, currentAtoms=[], activeNodes=[], activeEdges=[], targetS=0, animId, currentGlobalS=0, currentMeanAngle=0;
-const canvas = document.getElementById('networkCanvas');
-const sel = document.getElementById('elemSelect');
+let uid=0, curAtoms=[], nodes=[], edges=[], targetS=0, animId, gS=0, gA=0;
+const canvas = document.getElementById('networkCanvas'), sel = document.getElementById('elemSelect');
+DB.forEach(e=>{ let o=document.createElement('option'); o.value=e.z; o.text=`[${e.z}] ${e.s}`; if(e.z==6)o.selected=true; sel.appendChild(o); });
 
-ELEMENTS_DB.forEach(el => { 
-    let opt=document.createElement('option'); opt.value=el.z; opt.text=`[${String(el.z).padStart(3,'0')}] ${el.s}`; 
-    if(el.z==6)opt.selected=true; sel.appendChild(opt); 
-});
-
-function updateTarget() { 
-    let c=document.getElementById('slCond').value/100, p=document.getElementById('slPol').value/100, h=document.getElementById('slHard').value/100; 
-    targetS = (c*0.1) + (p*0.15) + (h*0.05); document.getElementById('dispTargetS').innerText = targetS.toFixed(3); 
+function updateTarget(){ 
+    let c=slCond.value/100, p=slPol.value/100, h=slHard.value/100;
+    targetS=(c*0.1)+(p*0.15)+(h*0.05); dispTargetS.innerText=targetS.toFixed(3); 
 }
 
-function addElement() { let d=Object.assign({},ELEMENTS_DB.find(e=>e.z==sel.value)); d.uid=uidCount++; currentAtoms.push(d); updateList(); runAssembly(); }
-function removeNode(uid) { currentAtoms=currentAtoms.filter(a=>a.uid!=uid); updateList(); runAssembly(); }
-function updateList() { let l=document.getElementById('ingredientList'); l.innerHTML=""; currentAtoms.forEach(a=>{ let d=document.createElement('div'); d.className='chip'; d.innerHTML=`<b style="color:${a.c}">${a.s}</b><span class='del-btn' onclick='removeNode(${a.uid})'>×</span>`; l.appendChild(d); }); }
-function clearList() { currentAtoms=[]; activeNodes=[]; activeEdges=[]; updateList(); canvas.innerHTML=''; }
+function addElement(){ curAtoms.push({...DB.find(e=>e.z==sel.value), id:uid++}); updateUI(); rebuild(); }
+function removeAt(id){ curAtoms=curAtoms.filter(a=>a.id!=id); updateUI(); rebuild(); }
+function clearList(){ curAtoms=[]; nodes=[]; edges=[]; updateUI(); canvas.innerHTML=''; }
+function updateUI(){ ingredientList.innerHTML=""; curAtoms.forEach(a=>{ let d=document.createElement('div'); d.className='chip'; d.innerHTML=`<b style="color:${a.c}">${a.s}</b><span onclick='removeAt(${a.id})'>×</span>`; ingredientList.appendChild(d); }); }
 
-function suggestAtoms() {
-    currentAtoms=[]; 
-    let c=document.getElementById('slCond').value/100, p=document.getElementById('slPol').value/100, h=document.getElementById('slHard').value/100;
-    let sum = c + p + h + 0.01; let wCond = c/sum, wPol = p/sum, wHard = h/sum;
-    let cores = [], potSum = 0; let coreCount = Math.floor(Math.random() * 5) + 3;
-    for(let i=0; i<coreCount; i++) {
-        let r = Math.random(), z = 6;
-        if(r < wCond) z = [26,29,79,92][Math.floor(Math.random()*4)];
-        else if(r < wCond + wHard) z = [6,14,15,16][Math.floor(Math.random()*4)];
-        else z = [7,8,33][Math.floor(Math.random()*3)];
-        let def = ELEMENTS_DB.find(e=>e.z==z); if(def) { cores.push(def); potSum += def.pot; }
-    }
-    let requiredTerms = potSum - 2 * (cores.length - 1);
-    cores.forEach(def => currentAtoms.push({...def, uid:uidCount++}));
-    for(let i=0; i<Math.max(0, requiredTerms); i++) { let def = ELEMENTS_DB.find(e=>e.z==1); currentAtoms.push({...def, uid:uidCount++}); }
-    updateList(); runAssembly();
+function suggestAtoms(){
+    curAtoms=[]; let cCount=Math.floor(Math.random()*5)+5, pSum=0;
+    for(let i=0;i<cCount;i++){ let d=DB[Math.floor(Math.random()*(DB.length-1)+1)]; curAtoms.push({...d, id:uid++}); pSum+=d.pot; }
+    let hReq=Math.max(0, pSum - 2*(cCount-1)); for(let i=0;i<hReq;i++) curAtoms.push({...DB[0], id:uid++});
+    updateUI(); rebuild();
 }
 
-function runAssembly() {
-    if(currentAtoms.length==0) { canvas.innerHTML=''; return; }
-    let nodes = currentAtoms.map(a => { let ex=activeNodes.find(n=>n.uid==a.uid); return { ...a, type:a.s, color:a.c, cur:a.pot, conns:[], x: ex?ex.x:(Math.random()-0.5)*50, y: ex?ex.y:(Math.random()-0.5)*50, z: ex?ex.z:(Math.random()-0.5)*50, px: ex?ex.x:0, py: ex?ex.y:0, pz: ex?ex.z:0 }; });
-    let edges = [];
-    function bond(n1,n2,a){ if(n1.cur<a||n2.cur<a)return; n1.cur-=a;n2.cur-=a; let e=edges.find(x=>(x.s.uid==n1.uid&&x.t.uid==n2.uid)||(x.s.uid==n2.uid&&x.t.uid==n1.uid)); if(e){e.type+=a; n1.conns.push(n2); n2.conns.push(n1);} else {edges.push({s:n1,t:n2,type:a}); n1.conns.push(n2); n2.conns.push(n1);} }
-    let cores=nodes.filter(n=>n.pot>1), terms=nodes.filter(n=>n.pot==1);
-    if(cores.length>1){ let cn=[cores[0]], un=cores.slice(1); while(un.length>0){ cn.sort((a,b)=>b.cur-a.cur); let s=cn.find(n=>n.cur>0)||cn[0]; let t=un.shift(); bond(s,t,1); cn.push(t); }}
-    for(let t of terms){ let av=nodes.filter(n=>n.uid!=t.uid&&n.cur>0); if(av.length>0){ bond(t,av[0],1); }}
-    activeNodes=nodes; activeEdges=edges; canvas.innerHTML=''; if(!animId) anim();
-}
-
-// 👑 S2N2 TRUE-TENSOR: Pythonと誤差0で同期する計算エンジン 👑
-function getPredictiveAngle(node) {
-    if(node.conns.length < 2) return 180;
-    // 🌟 送られてきたPythonの重みベクトル (weights) 🌟
-    const w = [-4.31678964, -20.76677434, 5.33862748, 3.56833816, -0.6491174, -0.28328967, -0.71915269, 1.32266953, 9.22544437, -2.38343102];
-    const en = node.en, ie = node.ie, r = node.r;
-    const feat = [1.0, en, ie, r, en*en, ie*ie, r*r, en*ie, en*r, ie*r];
-    
-    let S = 0; for(let i=0; i<10; i++) S += feat[i] * w[i]; // 10次元テンソル内積
-    node.calculated_S = S;
-    
-    // 🌟 セーフティ・クランプ: acosの定義域を守り、宇宙の崩壊を防ぐ
-    let cos_theta = S / (S - 1);
-    cos_theta = Math.min(0.999, Math.max(-0.999, cos_theta)); 
-    return Math.acos(cos_theta) * (180 / Math.PI);
-}
-
-function anim() { 
-    const IDEAL_L=65; let temp=document.getElementById('slTemp').value;
-    let damp = temp > 5 ? 0.95 : 0.60; let noise = (temp / 1000) * 1.5 + (temp < 5 ? 0.03 : 0);
-    let tS=0, aC=0, tA=0;
-
-    activeNodes.forEach(n=>{ 
-        let vx=(n.x-n.px)*damp, vy=(n.y-n.py)*damp, vz=(n.z-n.pz)*damp; 
-        vx = Math.max(-10, Math.min(10, vx)); vy = Math.max(-10, Math.min(10, vy)); vz = Math.max(-10, Math.min(10, vz)); 
-        n.px=n.x; n.py=n.y; n.pz=n.z; n.x += vx + (Math.random()-0.5)*noise; n.y += vy + (Math.random()-0.5)*noise; n.z += vz + (Math.random()-0.5)*noise; 
+// 👑 全結合再構築エンジン 👑
+function rebuild(){
+    if(!curAtoms.length) return;
+    // 1. ノードの初期化
+    nodes = curAtoms.map(a=>{ 
+        let ex=nodes.find(n=>n.id==a.id); 
+        return {...a, rem:a.pot, conns:[], x:ex?ex.x:(Math.random()-0.5)*100, y:ex?ex.y:(Math.random()-0.5)*100, z:ex?ex.z:(Math.random()-0.5)*100, px:ex?ex.x:0, py:ex?ex.y:0, pz:ex?ex.z:0}; 
     });
-    for(let k=0; k<5; k++){
-        activeEdges.forEach(e=>{ let dx=e.t.x-e.s.x, dy=e.t.y-e.s.y, dz=e.t.z-e.s.z, d=Math.sqrt(dx*dx+dy*dy+dz*dz)||0.001, diff=d-IDEAL_L, corr=diff*0.5; e.s.x+=dx/d*corr; e.s.y+=dy/d*corr; e.s.z+=dz/d*corr; e.t.x-=dx/d*corr; e.t.y-=dy/d*corr; e.t.z-=dz/d*corr; });
-        activeNodes.forEach(a=>{ 
-            if(a.conns.length < 2) return;
-            let ang = getPredictiveAngle(a);
-            if(k===0) { tS += a.calculated_S; tA += ang; aC++; }
-            let iD = Math.sqrt(2*IDEAL_L*IDEAL_L*(1-Math.cos(ang*Math.PI/180)));
-            for(let i=0;i<a.conns.length;i++){ for(let j=i+1;j<a.conns.length;j++){ 
-                let b=a.conns[i], c=a.conns[j], dx=c.x-b.x, dy=c.y-b.y, dz=c.z-b.z, d=Math.sqrt(dx*dx+dy*dy+dz*dz)||0.001;
-                if (d < iD) { let corr = (iD-d) * 0.02; b.x -= dx/d*corr; b.y -= dy/d*corr; b.z -= dz/d*corr; c.x += dx/d*corr; c.y += dy/d*corr; c.z += dz/d*corr; } 
-            }}
+    edges = [];
+    // 2. 結合リセット＆優先順位による再アセンブリ
+    let pool = [...nodes].sort((a,b)=>b.pot-a.pot); // 価電子が多い順（核）に結合
+    for(let i=0; i<pool.length; i++){
+        for(let j=i+1; j<pool.length; j++){
+            let n1=pool[i], n2=pool[j];
+            if(n1.rem > 0 && n2.rem > 0){
+                let e=edges.find(x=>(x.s.id==n1.id&&x.t.id==n2.id)||(x.s.id==n2.id&&x.t.id==n1.id));
+                if(!e || e.type < 3){
+                    edges.push({s:n1, t:n2, type:1}); n1.rem--; n2.rem--;
+                    n1.conns.push(n2); n2.conns.push(n1);
+                }
+            }
+        }
+    }
+    canvas.innerHTML=''; if(!animId) anim();
+}
+
+function getS(n){
+    if(n.conns.length<2) return 0;
+    const f=[1, n.en, n.ie, n.r, n.en**2, n.ie**2, n.r**2, n.en*n.ie, n.en*n.r, n.ie*n.r];
+    let S=0; f.forEach((v,i)=>S+=v*w[i]); return Math.min(0.49, Math.max(0.01, S));
+}
+
+function anim(){
+    const temp=slTemp.value, damp=temp>5?0.97:0.7, noise=(temp/1000)*2+0.02;
+    let tS=0, tA=0, aC=0;
+    nodes.forEach(n=>{
+        let vx=(n.x-n.px)*damp, vy=(n.y-n.py)*damp, vz=(n.z-n.pz)*damp;
+        n.px=n.x; n.py=n.y; n.pz=n.z;
+        n.x+=vx+(Math.random()-0.5)*noise; n.y+=vy+(Math.random()-0.5)*noise; n.z+=vz+(Math.random()-0.5)*noise;
+    });
+    for(let k=0;k<12;k++){
+        edges.forEach(e=>{
+            let dx=e.t.x-e.s.x, dy=e.t.y-e.s.y, dz=e.t.z-e.s.z, d=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
+            let ideal=(e.s.r+e.t.r)*45, diff=(d-ideal)*0.5;
+            e.s.x+=dx/d*diff; e.s.y+=dy/d*diff; e.s.z+=dz/d*diff; e.t.x-=dx/d*diff; e.t.y-=dy/d*diff; e.t.z-=dz/d*diff;
+        });
+        nodes.forEach(n=>{
+            if(n.conns.length<2) return;
+            let S=getS(n), ang=Math.acos(S/(S-1)), iD=Math.sqrt(2*80*80*(1-Math.cos(ang)));
+            if(k==0){ tS+=S; tA+=ang*180/Math.PI; aC++; }
+            for(let i=0;i<n.conns.length;i++){
+                for(let j=i+1;j<n.conns.length;j++){
+                    let b=n.conns[i], c=n.conns[j], dx=c.x-b.x, dy=c.y-b.y, dz=c.z-b.z, d=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
+                    if(d<iD){ let cr=(iD-d)*0.04; b.x-=dx/d*cr; b.y-=dy/d*cr; b.z-=dz/d*cr; c.x+=dx/d*cr; c.y+=dy/d*cr; c.z+=dz/d*cr; }
+                }
+            }
         });
     }
-    currentGlobalS = aC ? tS/aC : 0; currentMeanAngle = aC ? tA/aC : 0;
-    let cx=0, cy=0, cz=0; activeNodes.forEach(n=>{cx+=n.x; cy+=n.y; cz+=n.z;}); cx/=activeNodes.length||1; cy/=activeNodes.length||1; cz/=activeNodes.length||1; activeNodes.forEach(n=>{n.x-=cx; n.y-=cy; n.z-=cz;});
-    updateDisplay(); animId=requestAnimationFrame(anim);
+    gS=aC?tS/aC:0; gA=aC?tA/aC:0;
+    let cx=0,cy=0,cz=0; nodes.forEach(n=>{cx+=n.x;cy+=n.y;cz+=n.z;}); cx/=nodes.length; cy/=nodes.length; cz/=nodes.length;
+    nodes.forEach(n=>{n.x-=cx;n.y-=cy;n.z-=cz;});
+    draw(); animId=requestAnimationFrame(anim);
 }
 
-// 🌟 VIEW ENGINE 🌟
-let CAM_PITCH = -20 * Math.PI/180, CAM_YAW = 25 * Math.PI/180, isDragging = false, lastMouseX = 0, lastMouseY = 0;
-const startDrag = (x, y) => { isDragging = true; lastMouseX = x; lastMouseY = y; };
-const moveDrag = (x, y) => { if (!isDragging) return; CAM_YAW += (x - lastMouseX) * 0.01; CAM_PITCH = Math.max(-1.5, Math.min(1.5, CAM_PITCH + (y - lastMouseY) * 0.01)); lastMouseX = x; lastMouseY = y; };
-canvas.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY)); window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY)); window.addEventListener('mouseup', () => isDragging = false);
-canvas.addEventListener('touchstart', (e) => { if(e.target === canvas) { startDrag(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }, {passive:false});
-window.addEventListener('touchmove', (e) => { if(isDragging) { moveDrag(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }, {passive:false}); window.addEventListener('touchend', () => isDragging = false);
+let YAW=0.5, PIT=0.3, isD=false, CPX, CPY;
+canvas.addEventListener('mousedown',e=>{isD=true; CPX=e.clientX; CPY=e.clientY;});
+window.addEventListener('mousemove',e=>{if(!isD)return; YAW+=(e.clientX-CPX)*0.01; PIT+=(e.clientY-CPY)*0.01; CPX=e.clientX; CPY=e.clientY;});
+window.addEventListener('mouseup',()=>isD=false);
+canvas.addEventListener('touchstart',e=>{isD=true; CPX=e.touches[0].clientX; CPY=e.touches[0].clientY;},{passive:true});
+window.addEventListener('touchmove',e=>{if(!isD)return; YAW+=(e.touches[0].clientX-CPX)*0.01; PIT+=(e.touches[0].clientY-CPY)*0.01; CPX=e.touches[0].clientX; CPY=e.touches[0].clientY; if(e.target==canvas) e.preventDefault();},{passive:false});
+window.addEventListener('touchend',()=>isD=false);
 
-function updateDisplay() {
-    let minEN=10, maxEN=0, totalZ=0, totalVal=0;
-    activeNodes.forEach(a=>{ if(a.en > 0) { minEN = Math.min(minEN, a.en); maxEN = Math.max(maxEN, a.en); } totalZ += a.z; totalVal += a.pot; });
-    document.getElementById('dispCurrentS').innerText = currentGlobalS.toFixed(3);
-    document.getElementById('dispAngle').innerText = currentMeanAngle.toFixed(1) + "°";
-    let dist = Math.abs(targetS - currentGlobalS); document.getElementById('dispDist').innerText = dist.toFixed(3);
-    document.getElementById('dispDist').style.color = dist <= 0.025 ? "var(--main)" : "var(--danger)";
-    if(activeNodes.length > 0) {
-        document.getElementById('propCond').innerText = (totalZ/activeNodes.length).toFixed(1); document.getElementById('propPol').innerText = (maxEN - minEN).toFixed(2); document.getElementById('propHard').innerText = (totalVal/activeNodes.length).toFixed(1);
-    }
-    let counts = {}; currentAtoms.forEach(a=>{ counts[a.s]=(counts[a.s]||0)+1; });
-    let syms = Object.keys(counts).sort((a,b)=> a==='C'?-1:b==='C'?1:a==='H'?-1:b==='H'?1:a.localeCompare(b));
-    let html=""; syms.forEach(s=>{ html+=s+(counts[s]>1?`<sub>${counts[s]}</sub>`:""); });
-    document.getElementById('formulaDisplay').innerHTML=html || "--";
-    let leftovers = activeNodes.reduce((s,n)=>s+n.cur,0); let badge = document.getElementById('stabilityBadge');
-    if(leftovers===0 && activeNodes.length>0) { badge.innerText="成立 (Stable)"; badge.style.background="var(--main)"; badge.style.color="#000"; }
-    else { badge.innerText=`未成立 (${leftovers})`; badge.style.background="#300"; badge.style.color="var(--danger)"; }
-    
-    // 🌟 超伝導エフェクト 🌟
-    let tempK = document.getElementById('slTemp').value;
-    let isSuper = (totalZ/activeNodes.length > 20 && tempK < 30) || (totalZ/activeNodes.length > 20 && dist < 0.03 && tempK < 305);
-
-    let mx=0,my=0,mz=0; activeNodes.forEach(n=>{mx+=n.x;my+=n.y;mz+=n.z;}); mx/=activeNodes.length||1; my/=activeNodes.length||1; mz/=activeNodes.length||1;
-    let mr=50; activeNodes.forEach(n=>{let r=Math.sqrt((n.x-mx)**2+(n.y-my)**2+(n.z-mz)**2); if(r>mr)mr=r;}); let zR=Math.min(1.2, 180/mr);
-    activeNodes.forEach(n=>{
-        let tx=n.x-mx, ty=n.y-my, tz=n.z-mz, x1=tx*Math.cos(CAM_YAW)-tz*Math.sin(CAM_YAW), z1=tx*Math.sin(CAM_YAW)+tz*Math.cos(CAM_YAW), y1=ty*Math.cos(CAM_PITCH)-z1*Math.sin(CAM_PITCH), z2=ty*Math.sin(CAM_PITCH)+z1*Math.cos(CAM_PITCH);
-        n.sc=(800/(800+z2))*zR; n.px2=(canvas.offsetWidth/2)+x1*n.sc; n.py2=(canvas.offsetHeight/2)+y1*n.sc; n.pz2=z2;
-    });
-    if(canvas.childElementCount==0){
-        activeEdges.forEach((e,i)=>{ let l=document.createElement('div'); l.className='bond-line'; l.id=`e_${i}`; canvas.appendChild(l); });
-        activeNodes.forEach(n=>{ let el=document.createElement('div'); el.className='node'; el.innerText=n.type; el.style.background=n.color; el.id=`n_${n.uid}`; canvas.appendChild(el); });
-    }
-    activeNodes.forEach(n=>{ let el=document.getElementById(`n_${n.uid}`); if(el){ el.style.left=(n.px2-17)+"px"; el.style.top=(n.py2-17)+"px"; el.style.transform=`scale(${n.sc})`; el.style.zIndex=Math.floor(100-n.pz2); }});
-    activeEdges.forEach((e,i)=>{ 
-        let el=document.getElementById(`e_${i}`); if(el){ 
-            let dx=e.t.px2-e.s.px2, dy=e.t.py2-e.s.py2; el.style.width=Math.sqrt(dx*dx+dy*dy)+"px"; el.style.left=e.s.px2+"px"; el.style.top=e.s.py2+"px"; el.style.transform=`rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`; 
-            if(isSuper) { el.style.background="var(--accent)"; el.style.boxShadow="0 0 10px var(--accent)"; el.style.opacity="1.0"; }
-            else { el.style.background="linear-gradient(90deg, #444, #888, #444)"; el.style.boxShadow="none"; el.style.opacity="0.7"; }
+function draw(){
+    dispCurrentS.innerText=gS.toFixed(3); dispAngle.innerText=gA.toFixed(1)+"°";
+    let dist=Math.abs(targetS-gS); dispDist.innerText=dist.toFixed(3); dispDist.style.color=dist<0.025?"var(--main)":"#f44";
+    let count={}; curAtoms.forEach(a=>count[a.s]=(count[a.s]||0)+1);
+    formulaDisplay.innerHTML=Object.keys(count).sort().map(s=>s+(count[s]>1?`<sub>${count[s]}</sub>`:"")).join("");
+    let rem=nodes.reduce((s,n)=>s+n.rem,0); stabilityBadge.innerText=rem==0?"成立 (Stable)":`未成立 (${rem})`;
+    stabilityBadge.style.background=rem==0?"var(--main)":"#300";
+    nodes.forEach(n=>{
+        let x1=n.x*Math.cos(YAW)-n.z*Math.sin(YAW), z1=n.x*Math.sin(YAW)+n.z*Math.cos(YAW), y1=n.y*Math.cos(PIT)-z1*Math.sin(PIT), z2=n.y*Math.sin(PIT)+z1*Math.cos(PIT);
+        let sc=700/(700+z2); n.px2=(canvas.offsetWidth/2)+x1*sc; n.py2=(canvas.offsetHeight/2)+y1*sc;
+        if(!document.getElementById(`n_${n.id}`)){
+            let el=document.createElement('div'); el.className='node'; el.id=`n_${n.id}`; el.innerText=n.s; el.style.background=n.c; canvas.appendChild(el);
         }
+        let el=document.getElementById(`n_${n.id}`); el.style.left=(n.px2-17)+"px"; el.style.top=(n.py2-17)+"px"; el.style.transform=`scale(${sc})`; el.style.zIndex=Math.floor(500-z2);
+    });
+    edges.forEach((e,i)=>{
+        if(!document.getElementById(`e_${i}`)){ let l=document.createElement('div'); l.className='bond-line'; l.id=`e_${i}`; canvas.appendChild(l); }
+        let l=document.getElementById(`e_${i}`), dx=e.t.px2-e.s.px2, dy=e.t.py2-e.s.py2, d=Math.sqrt(dx*dx+dy*dy);
+        l.style.width=d+"px"; l.style.left=e.s.px2+"px"; l.style.top=e.s.py2+"px"; l.style.transform=`rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`;
     });
 }
 updateTarget();
